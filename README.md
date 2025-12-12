@@ -98,7 +98,41 @@ Streamlit Dashboard (Interactive)
 ```bash
 git clone https://github.com/<your-username>/feedback-to-strategy.git
 cd feedback-to-strategy
+```
 
 
 ### 2. Install dependencies
+```
+
 pip install -r frontend/requirements.txt
+```
+
+### 3. Set environment variables
+
+Create a .env file:
+```
+OPENAI_API_KEY=your_key_here
+N8N_WEBHOOK_URL=https://your-n8n-instance/webhook/feedback-webhook  # for Agentic Mode
+
+```
+### 4. Run the app locally
+streamlit run frontend/app.py
+```
+streamlit run frontend/app.py
+```
+
+Streamlit will open at: http://localhost:8501
+
+## Deploy on Streamlit Cloud
+
+### 1. Push your code to GitHub
+
+### 2. Go to https://streamlit.io/cloud
+
+### 3. Click New App → Select your repo → branch → frontend/app.py
+
+### 4. Add OPENAI_API_KEY and N8N_WEBHOOK_URL under Settings → Secrets
+
+### 5. Deploy
+
+## Project Structure
