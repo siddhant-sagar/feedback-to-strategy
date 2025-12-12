@@ -157,3 +157,23 @@ Streamlit will open at: http://localhost:8501
 ├── LICENSE                           # MIT License
 └── .gitignore                        # Git ignore definitions
 ```
+
+### Example Use Cases
+- Product managers analyzing app store reviews
+- UX researchers summarizing interview transcripts
+- Support teams triaging customer tickets
+- Course instructors summarizing end-of-semester feedback
+- Students turning assignment feedback into improvement plans
+
+### Roadmap
+- Slack / email integration for real-time alerts
+- Vector database for long-term insights
+- Automatic PRD-style recommendations
+- Multi-user workspace support
+- Fine-tuned evaluation metrics and calibration
+
+### Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss.
+
+### License
+MIT License
