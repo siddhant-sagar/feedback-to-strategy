@@ -7,7 +7,7 @@ import google.generativeai as genai
 # -------------------------------------------------------------
 # 1. CONFIGURE GEMINI
 # -------------------------------------------------------------
-configure(api_key=GEMINI_API_KEY)
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 MODEL_NAME = "models/gemini-2.0-flash"   # or "gemini-1.5-pro"
 
