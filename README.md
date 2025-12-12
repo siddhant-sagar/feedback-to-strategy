@@ -1,10 +1,8 @@
-#  **Feedback-to-Strategy AI Agent
-**
+#  Feedback-to-Strategy AI Agent
 
 ## A Human–AI system that transforms raw user feedback into structured, actionable product insights.
 
-**Overview
-**
+## Overview
 Feedback-to-Strategy is a Streamlit-based application with two possible workflows:
 
 1. Direct AI Mode (app.py)
