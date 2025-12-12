@@ -123,16 +123,37 @@ streamlit run frontend/app.py
 
 Streamlit will open at: http://localhost:8501
 
-## Deploy on Streamlit Cloud
+# Deploy on Streamlit Cloud
 
-### 1. Push your code to GitHub
+1. Push your code to GitHub
 
-### 2. Go to https://streamlit.io/cloud
+2. Go to https://streamlit.io/cloud
 
-### 3. Click New App → Select your repo → branch → frontend/app.py
+3. Click New App → Select your repo → branch → frontend/app.py
 
-### 4. Add OPENAI_API_KEY and N8N_WEBHOOK_URL under Settings → Secrets
+4. Add OPENAI_API_KEY and N8N_WEBHOOK_URL under Settings → Secrets
 
-### 5. Deploy
+5. Deploy
 
-## Project Structure
+### Project Structure
+```
+/feedback-to-strategy
+│
+├── frontend/                          # Streamlit frontend application
+│   ├── agenntic-app.py                        # Main Streamlit UI
+│   ├── utils.py                      # Helper functions for dashboards
+│   ├── requirements.txt              # Python dependencies
+│   └── .env.example                  # Example environment variables
+│
+├── n8n-workflows/                    # Agentic backend automation
+│   └── feedback-to-insights.json     # n8n workflow for feedback processing
+│
+├── data/                             # Optional sample datasets / CSV templates
+│   └── sample_feedback.csv
+│
+├── app.py
+│
+├── README.md                         # Project overview (you’re here)
+├── LICENSE                           # MIT License
+└── .gitignore                        # Git ignore definitions
+```
