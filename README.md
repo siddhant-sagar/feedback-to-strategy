@@ -1,7 +1,7 @@
-**Feedback-to-Strategy AI Agent
+#  **Feedback-to-Strategy AI Agent
 **
 
-A Human–AI system that transforms raw user feedback into structured, actionable product insights.
+## A Human–AI system that transforms raw user feedback into structured, actionable product insights.
 
 **Overview
 **
