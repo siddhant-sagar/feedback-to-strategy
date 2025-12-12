@@ -65,3 +65,40 @@ The goal: turn feedback chaos into clarity, with transparent, explainable insigh
 
 ### Direct AI Mode (Quick, Local)
 
+Streamlit UI
+│
+▼
+Gemini/OpenAI API
+│
+▼
+JSON Output → Streamlit Dashboard
+
+
+### Agentic Mode (Automated, n8n Backend)
+
+Streamlit UI
+│
+▼
+Webhook → n8n Workflow
+│
+├─ AI Analysis (Gemini/OpenAI)
+├─ Compute Confidence
+├─ Store in Google Sheets / DB
+└─ Weekly Digest (Cron) → Email / Slack
+│
+▼
+Streamlit Dashboard (Interactive)
+
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/<your-username>/feedback-to-strategy.git
+cd feedback-to-strategy
+
+
+### 2. Install dependencies
+pip install -r frontend/requirements.txt
