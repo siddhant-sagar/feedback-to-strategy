@@ -1,0 +1,118 @@
+{
+  "name": "Feedback-to-Insights",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feedback-webhook"
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  item.json.feedback_text = item.json.feedback_text?.trim() || '';\n  return item;\n});"
+      },
+      "name": "Preprocess Feedback",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\n  \"model\": \"gpt-4\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"You are a feedback insights AI. Analyze the feedback and return JSON with keys: category (bug/feature_request/ux_issue/performance/documentation/other), sentiment (positive/neutral/negative), summary (1-2 sentences), key_phrases (3-6 items), explanation (short reasoning).\"},\n    {\"role\": \"user\", \"content\": \"{{ $json[\\\"feedback_text\\\"] }}\"}\n  ]\n}"
+      },
+      "name": "AI Feedback Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  let data = {};\n  try {\n    const ai_response = item.json.choices[0].message.content;\n    data = JSON.parse(ai_response);\n  } catch(e) {\n    data = {\n      category: 'other',\n      sentiment: 'neutral',\n      summary: item.json.feedback_text.slice(0,120)+'...',\n      key_phrases: [],\n      explanation: 'Fallback applied'\n    };\n  }\n  let confidence = 0;\n  confidence += Math.min((data.key_phrases?.length || 0)/6,1)*0.4;\n  confidence += ['positive','negative'].includes(data.sentiment)?0.4:0.2;\n  confidence += ['other', null, ''].includes(data.category)?0:0.2;\n  data.confidence = Math.round(confidence*100)/100;\n  return { json: data };\n});"
+      },
+      "name": "Compute Confidence",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "YOUR_GOOGLE_SHEET_ID",
+        "range": "Sheet1!A:F",
+        "options": {}
+      },
+      "name": "Store in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "minute": 0,
+              "weekDays": [1]
+            }
+          ]
+        }
+      },
+      "name": "Weekly Digest Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 600]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { feedback_rows: items.map(i => i.json) } }];"
+      },
+      "name": "Prepare Weekly Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "jsonParameters": true,
+        "bodyParametersJson": "{\n  \"model\": \"gpt-4\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"Generate weekly feedback digest with top themes, emerging issues, sentiment trends, recommendations in clean Markdown format.\"},\n    {\"role\": \"user\", \"content\": \"{{ $json[\\\"feedback_rows\\\"] }}\"}\n  ]\n}"
+      },
+      "name": "Generate Weekly Digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [650, 600]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "team@example.com",
+        "subject": "Weekly Feedback Digest",
+        "text": "{{ $json[\"choices\"][0][\"message\"][\"content\"] }}"
+      },
+      "name": "Send Digest Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [850, 600]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{"node":"Preprocess Feedback","type":"main","index":0}]] },
+    "Preprocess Feedback": { "main": [[{"node":"AI Feedback Analysis","type":"main","index":0}]] },
+    "AI Feedback Analysis": { "main": [[{"node":"Compute Confidence","type":"main","index":0}]] },
+    "Compute Confidence": { "main": [[{"node":"Store in Google Sheets","type":"main","index":0}]] },
+    "Weekly Digest Trigger": { "main": [[{"node":"Prepare Weekly Data","type":"main","index":0}]] },
+    "Prepare Weekly Data": { "main": [[{"node":"Generate Weekly Digest","type":"main","index":0}]] },
+    "Generate Weekly Digest": { "main": [[{"node":"Send Digest Email","type":"main","index":0}]] }
+  }
+}
