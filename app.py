@@ -242,13 +242,11 @@ elif mode == "Batch (CSV)":
         else:
             if st.button("Process All"):
                 results = []
-
                 with st.spinner("Running batch analysis…"):
                     for fb in df["feedback"].tolist():
                         results.append(analyze_feedback(fb))
 
                 out_df = pd.DataFrame(results)
-
                 st.success("Completed!")
                 st.dataframe(out_df)
 
@@ -258,13 +256,46 @@ elif mode == "Batch (CSV)":
                     "results.csv"
                 )
 
+                # ---------------------------
+                # DASHBOARD INSIGHTS
+                # ---------------------------
+                st.subheader("📊 Batch Feedback Insights Dashboard")
+
+                # Category Distribution
+                st.markdown("**Category Distribution**")
+                cat_counts = out_df["category"].value_counts()
+                st.bar_chart(cat_counts)
+
+                # Sentiment Distribution
+                st.markdown("**Sentiment Distribution**")
+                sentiment_counts = out_df["sentiment"].value_counts()
+                st.bar_chart(sentiment_counts)
+
+                # Emerging Themes
+                st.markdown("**Emerging Themes**")
+                all_phrases = []
+                for kp in out_df["key_phrases"]:
+                    try:
+                        phrases = json.loads(kp.replace("'", '"')) if isinstance(kp, str) else kp
+                        if isinstance(phrases, list):
+                            all_phrases.extend(phrases)
+                    except:
+                        pass
+                phrase_counts = pd.Series(all_phrases).value_counts().head(10)
+                st.table(phrase_counts)
+
+                # Confidence Scores
+                st.markdown("**Confidence Scores**")
+                st.metric("Average Confidence", round(out_df["confidence"].mean(), 2))
+                st.line_chart(out_df["confidence"])
+
+
 
 # -------------------------------------------------------------
 # WEEKLY STRATEGY DIGEST MODE
 # -------------------------------------------------------------
 elif mode == "Weekly Strategy Digest":
     st.header("📅 Weekly Strategy Digest Generator")
-
     file = st.file_uploader("Upload processed CSV from Batch mode")
 
     required = ["category", "sentiment", "summary", "key_phrases", "explanation", "confidence"]
@@ -290,69 +321,35 @@ elif mode == "Weekly Strategy Digest":
                     "weekly_digest.md"
                 )
 
-# -------------------------------------------------------------
-# DASHBOARD MODE
-# -------------------------------------------------------------
-elif mode == "Dashboard":
-    st.header("📊 Feedback Insights Dashboard")
-    file = st.file_uploader("Upload processed CSV from Batch mode")
+                # ---------------------------
+                # DASHBOARD INSIGHTS
+                # ---------------------------
+                st.subheader("📊 Weekly Feedback Insights Dashboard")
 
-    required = ["category", "sentiment", "summary", "key_phrases", "explanation", "confidence"]
+                # Category Distribution
+                st.markdown("**Category Distribution**")
+                cat_counts = df["category"].value_counts()
+                st.bar_chart(cat_counts)
 
-    if file:
-        df = pd.read_csv(file)
+                # Sentiment Distribution
+                st.markdown("**Sentiment Distribution**")
+                sentiment_counts = df["sentiment"].value_counts()
+                st.bar_chart(sentiment_counts)
 
-        if not all(col in df.columns for col in required):
-            st.error("CSV must be the output of Batch Mode.")
-        else:
-            st.success("CSV loaded successfully!")
+                # Emerging Themes
+                st.markdown("**Emerging Themes**")
+                all_phrases = []
+                for kp in df["key_phrases"]:
+                    try:
+                        phrases = json.loads(kp.replace("'", '"')) if isinstance(kp, str) else kp
+                        if isinstance(phrases, list):
+                            all_phrases.extend(phrases)
+                    except:
+                        pass
+                phrase_counts = pd.Series(all_phrases).value_counts().head(10)
+                st.table(phrase_counts)
 
-            # ---------------------------
-            # CATEGORY DISTRIBUTION
-            # ---------------------------
-            st.subheader("1️⃣ Category Distribution")
-            cat_counts = df["category"].value_counts()
-            st.bar_chart(cat_counts)
-
-            # ---------------------------
-            # SENTIMENT DISTRIBUTION
-            # ---------------------------
-            st.subheader("2️⃣ Sentiment Distribution")
-            sentiment_counts = df["sentiment"].value_counts()
-            st.bar_chart(sentiment_counts)
-
-            # ---------------------------
-            # EMERGING THEMES
-            # ---------------------------
-            st.subheader("3️⃣ Emerging Themes")
-            # Flatten key_phrases list
-            all_phrases = []
-            for kp in df["key_phrases"]:
-                try:
-                    phrases = json.loads(kp.replace("'", '"')) if isinstance(kp, str) else kp
-                    if isinstance(phrases, list):
-                        all_phrases.extend(phrases)
-                except:
-                    pass
-            phrase_counts = pd.Series(all_phrases).value_counts().head(10)
-            st.table(phrase_counts)
-
-            # ---------------------------
-            # CONFIDENCE SCORE
-            # ---------------------------
-            st.subheader("4️⃣ Confidence Scores")
-            st.metric("Average Confidence", round(df["confidence"].mean(), 2))
-            st.line_chart(df["confidence"])
-
-            # Optional download of dashboard summary
-            summary_text = f"""
-            Category Counts:\n{cat_counts.to_dict()}\n
-            Sentiment Counts:\n{sentiment_counts.to_dict()}\n
-            Top Key Phrases:\n{phrase_counts.to_dict()}\n
-            Average Confidence: {round(df["confidence"].mean(), 2)}
-            """
-            st.download_button(
-                "Download Dashboard Summary",
-                summary_text,
-                "dashboard_summary.txt"
-            )
+                # Confidence Scores
+                st.markdown("**Confidence Scores**")
+                st.metric("Average Confidence", round(df["confidence"].mean(), 2))
+                st.line_chart(df["confidence"])
