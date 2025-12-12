@@ -203,7 +203,7 @@ st.write("Turn raw user feedback into structured insights + weekly strategy repo
 
 mode = st.sidebar.radio(
     "Mode",
-    ["Single Feedback", "Batch (CSV)", "Weekly Strategy Digest"]
+    ["Single Feedback", "Batch (CSV)", "Weekly Strategy Digest", "Dashboard"]
 )
 
 
